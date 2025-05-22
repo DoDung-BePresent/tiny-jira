@@ -1,0 +1,13 @@
+@layer components {
+  .sidebar-container {
+    @apply bg-primary fixed top-0 bottom-0 left-0 flex w-16 flex-col overflow-x-hidden py-7 text-white transition-[width] duration-200 ease-in-out hover:w-52 hover:shadow-[0_0_50px_0_rgba(0,0,0,0.6)];
+  }
+
+  .sidebar-menu-item {
+    @apply flex items-center gap-4 p-2 px-5 hover:bg-white/12;
+  }
+
+  .sidebar-menu-item-span {
+    @apply invisible w-0 text-sm font-medium whitespace-nowrap opacity-0 transition-[opacity,width,visibility] duration-150 group-hover:visible group-hover:w-auto group-hover:opacity-100;
+  }
+}

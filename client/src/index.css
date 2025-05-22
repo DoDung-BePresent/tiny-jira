@@ -1,0 +1,58 @@
+@import 'tailwindcss';
+
+@font-face {
+  font-family: 'CircularStd';
+  src:
+    url('/fonts/CircularStd-Book.woff2') format('woff2'),
+    url('/fonts/CircularStd-Book.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'CircularStd';
+  src:
+    url('/fonts/CircularStd-Medium.woff2') format('woff2'),
+    url('/fonts/CircularStd-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'CircularStd';
+  src:
+    url('/fonts/CircularStd-Bold.woff2') format('woff2'),
+    url('/fonts/CircularStd-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'CircularStd';
+  src:
+    url('/fonts/CircularStd-Black.woff2') format('woff2'),
+    url('/fonts/CircularStd-Black.woff') format('woff');
+  font-weight: 900;
+  font-style: normal;
+}
+
+@theme {
+  --font-sans: 'CircularStd', sans-serif;
+
+  --color-primary: rgb(7, 71, 166);
+  --color-primary-foreground: rgb(255, 255, 255);
+  --color-muted: rgb(244, 245, 247);
+  --color-muted-foreground: rgb(94, 108, 132);
+  --color-border: rgb(223, 225, 230);
+  --color-accent: rgb(244, 245, 247);
+  --color-accent-foreground: rgb(66, 82, 110);
+}
+
+@layer utilities {
+  .border {
+    @apply border-border;
+  }
+}
+
+/* Import styles */
+@import './styles/main-layout.css';

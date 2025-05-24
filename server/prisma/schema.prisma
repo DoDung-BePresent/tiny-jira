@@ -6,10 +6,93 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int  @id @default(autoincrement())
+  email     String  @unique
+  name      String  
+  avatarUrl String?
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId Int
+  comments  Comment[]
+  issues    Issue[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Project {
+  id          Int @id @default(autoincrement())
+  name        String
+  url         String?
+  description String?
+  users       User[]
+  issues      Issue[]
+  category    CategoryType
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Issue {
+  id            Int @id @default(autoincrement())
+  title         String
+  type          IssueType
+  status        IssueStatus
+  priority      IssuePriority
+  listPosition  Int
+  description   String?
+  estimate      Int?
+  timeSpend     Int?
+  project       Project @relation(fields: [projectId], references: [id])
+  projectId     Int
+  comments      Comment[]
+  users         User[]
+  reportedId    Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Comment {
+  id            Int @id @default(autoincrement())
+  body          String
+  user          User    @relation(fields: [userId], references: [id])
+  userId        Int
+  issue         Issue   @relation(fields: [issueId], references: [id])
+  issueId       Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+
+
+enum IssueType {
+  TASK
+  BUG
+  STORY
+}
+
+enum IssueStatus {
+  BACKLOG
+  SELECTED
+  INPROGRESS
+  DONE
+}
+
+enum IssuePriority {
+  HIGHEST
+  HIGH
+  MEDIUM
+  LOW
+  LOWEST
+}
+
+enum CategoryType {
+  SOFTWARE
+  MARKETING
+  BUSINESS
 }

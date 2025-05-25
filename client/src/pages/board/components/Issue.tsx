@@ -25,8 +25,8 @@ export const Issue = ({
   type,
   priority,
   id,
-  users,
   className,
+  users
 }: IssueType & {
   className?: string;
 }) => {
@@ -65,7 +65,7 @@ export const Issue = ({
         <div className="flex flex-1 items-center justify-end -space-x-2">
           {users.map((user) => (
             <Avatar
-              key={user.avatarUrl}
+              key={user.id}
               avatarUrl={user.avatarUrl}
               name={user.name}
               size={28}

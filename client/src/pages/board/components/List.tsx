@@ -11,40 +11,46 @@ import {
 /**
  * Types
  */
-import type { Issue as IssueType } from '@/types/issue';
+import type { IssueStatus, Issue as IssueType } from '@/types/issue';
 
 /**
  * Components
  */
 import { Issue } from './Issue';
+import { IssueStatusCopy } from '@/constants/issue';
 
 export const List = ({
   id,
-  title,
+  status,
   issues,
 }: {
   id: string;
-  title: string;
+  status: IssueStatus;
   issues: IssueType[];
 }) => {
   const { setNodeRef } = useDroppable({ id });
 
-  const issueIds = useMemo(() => issues.map((issue) => issue.id), [issues]);
+  const filteredIssues = issues.filter((i) => i.status === status);
 
+  const issueIds = useMemo(
+    () => filteredIssues.map((issue) => issue.id),
+    [issues],
+  );
+  
   return (
     <div
       ref={setNodeRef}
       className="bg-muted min-w-[270px] flex-1 rounded-[3px] p-1 py-2 transition-colors duration-150"
     >
       <h1 className="text-accent-foreground mx-1 my-3 mt-1 text-xs uppercase">
-        {title}
+        {IssueStatusCopy[status]}
       </h1>
       <div className="flex flex-col gap-1">
         <SortableContext
           items={issueIds}
           strategy={verticalListSortingStrategy}
         >
-          {issues.map((issue) => (
+          {filteredIssues.map((issue) => (
             <Issue key={issue.id} {...issue} />
           ))}
         </SortableContext>

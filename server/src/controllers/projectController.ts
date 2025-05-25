@@ -12,7 +12,7 @@ import { AppError } from '../utils/AppError';
 export const projectController = {
   async getProjects(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = req.userId
+      const userId = req.userId;
 
       const projects = await prisma.project.findMany({
         where: {
@@ -24,7 +24,17 @@ export const projectController = {
         },
         include: {
           users: true,
-          issues: true,
+          issues: {
+            include: {
+              users: {
+                select: {
+                  id: true,
+                  avatarUrl: true,
+                  name: true,
+                },
+              },
+            },
+          },
         },
       });
 
@@ -35,7 +45,6 @@ export const projectController = {
       }
 
       res.json({
-        success: true,
         data: projects,
       });
     } catch (error) {

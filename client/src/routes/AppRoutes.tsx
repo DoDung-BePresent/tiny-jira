@@ -11,8 +11,9 @@ import { MainLayout } from '@/layouts/MainLayout';
 
 /**
  * Pages
- */
-import { BoardPage, ProjectSettingsPage } from '@/pages/board';
+*/
+import { BoardPage } from '@/pages/board/BoardPage';
+import { ProjectSettingsPage } from '@/pages/project-settings/ProjectSettingsPage';
 
 export const AppRoutes = () => {
   return (

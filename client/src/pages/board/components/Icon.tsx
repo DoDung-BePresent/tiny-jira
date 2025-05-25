@@ -1,4 +1,4 @@
-import type { IssuePriority, IssueType } from '@/types/issue';
+import { IssuePriority, IssueType } from '@/types/issue';
 import {
   ArrowDownIcon,
   ArrowUpIcon,
@@ -9,7 +9,7 @@ import {
 
 export const IssueTypeIcon = ({ type }: { type: IssueType }) => {
   switch (type) {
-    case 'task':
+    case IssueType.TASK:
       return (
         <BookmarkIcon
           fill="rgb(101,186,67)"
@@ -17,14 +17,14 @@ export const IssueTypeIcon = ({ type }: { type: IssueType }) => {
           className="size-5"
         />
       );
-    case 'bug':
+    case IssueType.BUG:
       return (
         <CircleAlertIcon
           fill="rgb(228,77,66)"
           className="size-5 stroke-white"
         />
       );
-    case 'story':
+    case IssueType.STORY:
       return (
         <SquareCheckIcon
           fill="rgb(79,173,230)"
@@ -42,11 +42,11 @@ export const IssuePriorityIcon = ({
   priority: IssuePriority;
 }) => {
   switch (priority) {
-    case 'low':
+    case IssuePriority.LOW:
       return <ArrowDownIcon className="size-5 text-green-500" />;
-    case 'medium':
+    case IssuePriority.MEDIUM:
       return <ArrowUpIcon className="size-5 text-orange-500" />;
-    case 'high':
+    case IssuePriority.HIGH:
       return <ArrowUpIcon className="size-5 text-red-500" />;
     default:
       break;

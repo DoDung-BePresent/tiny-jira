@@ -26,7 +26,7 @@ export const Issue = ({
   priority,
   id,
   className,
-  users
+  users,
 }: IssueType & {
   className?: string;
 }) => {
@@ -39,6 +39,9 @@ export const Issue = ({
     isDragging,
   } = useSortable({
     id,
+    data: {
+      type: 'Issue',
+    },
   });
 
   const style = {

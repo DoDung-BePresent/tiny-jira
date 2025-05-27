@@ -28,19 +28,21 @@ export const List = ({
   status: IssueStatus;
   issues: IssueType[];
 }) => {
-  const { setNodeRef } = useDroppable({ id });
+  // Sử dụng id của status làm id của droppable area
+  const { setNodeRef } = useDroppable({
+    id,
+    data: {
+      type: 'List',
+      status,
+    },
+  });
 
-  const filteredIssues = issues.filter((i) => i.status === status);
+  const issueIds = useMemo(() => issues.map((issue) => issue.id), [issues]);
 
-  const issueIds = useMemo(
-    () => filteredIssues.map((issue) => issue.id),
-    [issues],
-  );
-  
   return (
     <div
-      ref={setNodeRef}
       className="bg-muted min-w-[270px] flex-1 rounded-[3px] p-1 py-2 transition-colors duration-150"
+      ref={setNodeRef}
     >
       <h1 className="text-accent-foreground mx-1 my-3 mt-1 text-xs uppercase">
         {IssueStatusCopy[status]}
@@ -50,7 +52,7 @@ export const List = ({
           items={issueIds}
           strategy={verticalListSortingStrategy}
         >
-          {filteredIssues.map((issue) => (
+          {issues.map((issue) => (
             <Issue key={issue.id} {...issue} />
           ))}
         </SortableContext>

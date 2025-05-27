@@ -7,6 +7,7 @@ import {
   DragOverlay,
   type DragEndEvent,
   type DragStartEvent,
+  type DragOverEvent,
 } from '@dnd-kit/core';
 
 /**
@@ -45,24 +46,56 @@ export const BoardPage = () => {
     if (issue) setActiveIssue(issue);
   };
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    setActiveIssue(null);
+  const handleDragOver = (event: DragOverEvent) => {
+    console.log('@@LOG: HANDLEDRAGOVER');
     const { active, over } = event;
     if (!over) return;
 
-    const activeIndex = issues.findIndex((i) => i.id === active.id);
-    const overIndex = issues.findIndex((i) => i.id === over.id);
+    const activeId = active.id;
+    const overId = over.id;
 
-    if (activeIndex !== overIndex) {
-      setIssues((pre) => arrayMove(pre, activeIndex, overIndex));
+    if (activeId === overId) return;
+
+    const isActiveIssue = active.data.current?.type === 'Issue';
+    const isOverIssue = over.data.current?.type === 'Issue';
+
+    if (isActiveIssue && isOverIssue) {
+      setIssues((prev) => {
+        const activeIndex = prev.findIndex((i) => i.id === activeId);
+        const overIndex = prev.findIndex((i) => i.id === overId);
+
+        prev[activeIndex].status = prev[overIndex].status;
+
+        return arrayMove(prev, activeIndex, overIndex);
+      });
     }
+
+    const isOverList = over.data.current?.type === 'List';
+    const overListStatus = over.data.current?.status;
+
+    if (isOverList && isActiveIssue) {
+      setIssues((prev) => {
+        const activeIndex = prev.findIndex((i) => i.id === activeId);
+        prev[activeIndex].status = overListStatus;
+
+        return arrayMove(prev, activeIndex, activeIndex);
+      });
+    }
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    setActiveIssue(null);
   };
 
   if (isLoading) return <p>Loading</p>;
   if (!projects?.length) return <p>No projects found</p>;
 
   return (
-    <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+    <DndContext
+      onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
+      onDragEnd={handleDragEnd}
+    >
       <h1 className="mt-1 text-2xl font-medium text-[rgb(23,43,77)]">
         Kanban board
       </h1>

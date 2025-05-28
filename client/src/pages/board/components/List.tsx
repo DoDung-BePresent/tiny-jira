@@ -29,7 +29,7 @@ export const List = ({
   issues: IssueType[];
 }) => {
   // Sử dụng id của status làm id của droppable area
-  const { setNodeRef } = useDroppable({
+  const { setNodeRef, isOver } = useDroppable({
     id,
     data: {
       type: 'List',
@@ -41,13 +41,13 @@ export const List = ({
 
   return (
     <div
-      className="bg-muted min-w-[270px] flex-1 rounded-[3px] p-1 py-2 transition-colors duration-150"
       ref={setNodeRef}
+      className="bg-muted min-w-[270px] flex-1 rounded-[3px] p-1 py-2 transition-colors duration-150"
     >
       <h1 className="text-accent-foreground mx-1 my-3 mt-1 text-xs uppercase">
         {IssueStatusCopy[status]}
       </h1>
-      <div className="flex flex-col gap-1">
+      <div className="flex h-full flex-col gap-1">
         <SortableContext
           items={issueIds}
           strategy={verticalListSortingStrategy}

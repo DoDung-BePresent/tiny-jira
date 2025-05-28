@@ -27,6 +27,7 @@ export const Issue = ({
   id,
   className,
   users,
+  status,
 }: IssueType & {
   className?: string;
 }) => {
@@ -37,10 +38,12 @@ export const Issue = ({
     transform,
     transition,
     isDragging,
+    isOver,
   } = useSortable({
     id,
     data: {
       type: 'Issue',
+      status,
     },
   });
 
@@ -56,8 +59,9 @@ export const Issue = ({
       {...listeners}
       style={style}
       className={cn(
-        'hover:bg-muted rounded-xs bg-white p-2 shadow-[0px_1px_2px_0px_rgba(9,30,66,0.25)] select-none',
+        'hover:bg-muted rounded-xs bg-white p-2 shadow-[0px_1px_2px_0px_rgba(9,30,66,0.25)] select-none hover:cursor-grab',
         isDragging && 'invisible',
+        isOver && 'border-b-2 border-blue-300',
         className,
       )}
     >

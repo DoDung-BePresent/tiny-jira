@@ -1,14 +1,19 @@
 /**
  * Node modules
  */
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   DndContext,
   DragOverlay,
   type DragEndEvent,
   type DragStartEvent,
   type DragOverEvent,
+  useSensors,
+  PointerSensor,
+  useSensor,
+  KeyboardSensor,
 } from '@dnd-kit/core';
+import { throttle } from 'lodash';
 
 /**
  * Types
@@ -23,11 +28,12 @@ import { Filter } from './components/Filter';
 import { Issue as IssueComponent } from './components/Issue';
 import { useQuery } from '@tanstack/react-query';
 import { projectService } from '@/services/projectService';
-import { arrayMove } from '@dnd-kit/sortable';
+import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 
 export const BoardPage = () => {
   const [issues, setIssues] = useState<Issue[]>([]);
   const [activeIssue, setActiveIssue] = useState<Issue | null>(null);
+  const [isAfter, setIsAfter] = useState(false);
 
   const { data: projects, isLoading } = useQuery({
     queryKey: ['auth-user'],
@@ -40,50 +46,79 @@ export const BoardPage = () => {
     }
   }, [projects]);
 
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
   const handleDragStart = (event: DragStartEvent) => {
     const { id } = event.active;
     const issue = issues.find((i: Issue) => i.id === id);
     if (issue) setActiveIssue(issue);
   };
 
-  const handleDragOver = (event: DragOverEvent) => {
-    console.log('@@LOG: HANDLEDRAGOVER');
-    const { active, over } = event;
-    if (!over) return;
+  const handleDragOver = useCallback(
+    throttle((event: DragOverEvent) => {
+      const { active, over } = event;
+      if (!over) return;
 
-    const activeId = active.id;
-    const overId = over.id;
+      const activeId = active.id;
+      const overId = over.id;
 
-    if (activeId === overId) return;
+      if (activeId === overId) return;
 
-    const isActiveIssue = active.data.current?.type === 'Issue';
-    const isOverIssue = over.data.current?.type === 'Issue';
+      const isActiveIssue = active.data.current?.type === 'Issue';
+      const isOverIssue = over.data.current?.type === 'Issue';
 
-    if (isActiveIssue && isOverIssue) {
-      setIssues((prev) => {
-        const activeIndex = prev.findIndex((i) => i.id === activeId);
-        const overIndex = prev.findIndex((i) => i.id === overId);
+      if (isActiveIssue && isOverIssue) {
+        const activeIssueStatus = active.data.current?.status;
+        const overIssueStatus = over.data.current?.status;
 
-        prev[activeIndex].status = prev[overIndex].status;
+        if (activeIssueStatus === overIssueStatus) {
+          setIssues((prev) => {
+            const activeIndex = prev.findIndex((i) => i.id === activeId);
+            const overIndex = prev.findIndex((i) => i.id === overId);
 
-        return arrayMove(prev, activeIndex, overIndex);
-      });
-    }
+            const newIssues = [...prev];
+            const activeIssue = { ...newIssues[activeIndex] };
+            activeIssue.status = newIssues[overIndex].status;
+            newIssues[activeIndex] = activeIssue;
+            return arrayMove(prev, activeIndex, overIndex);
+          });
+        } else {
+          setIssues((prev) => {
+            const activeIndex = prev.findIndex((i) => i.id === activeId);
 
-    const isOverList = over.data.current?.type === 'List';
-    const overListStatus = over.data.current?.status;
+            const newIssues = [...prev];
+            const activeIssue = { ...newIssues[activeIndex] };
+            activeIssue.status = overIssueStatus;
+            newIssues[activeIndex] = activeIssue;
+            return newIssues;
+          });
+        }
+      }
 
-    if (isOverList && isActiveIssue) {
-      setIssues((prev) => {
-        const activeIndex = prev.findIndex((i) => i.id === activeId);
-        prev[activeIndex].status = overListStatus;
+      const isOverList = over.data.current?.type === 'List';
+      const overListStatus = over.data.current?.status;
 
-        return arrayMove(prev, activeIndex, activeIndex);
-      });
-    }
-  };
+      if (isOverList && isActiveIssue) {
+        setIssues((prev) => {
+          const activeIndex = prev.findIndex((i) => i.id === activeId);
+          const newIssues = [...prev];
+          const activeIssue = { ...newIssues[activeIndex] };
+          activeIssue.status = overListStatus;
+          newIssues[activeIndex] = activeIssue;
+          return newIssues;
+        });
+      }
+    }, 100),
+    [],
+  );
 
   const handleDragEnd = (event: DragEndEvent) => {
+    // const { active, over } = event;
     setActiveIssue(null);
   };
 
@@ -92,6 +127,7 @@ export const BoardPage = () => {
 
   return (
     <DndContext
+      sensors={sensors}
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}

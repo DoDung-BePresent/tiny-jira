@@ -22,7 +22,7 @@ export enum IssueStatus {
 }
 
 export type Issue = {
-  id: string;
+  id: number;
   title: string;
   type: IssueType;
   status: IssueStatus;
@@ -34,4 +34,12 @@ export type Issue = {
   projectId: number;
   reportedId: number;
   users: User[];
+};
+
+export type UpdateIssuePayload = {
+  issueId: number;
+  data: {
+    status: IssueStatus;
+    listPosition: number;
+  };
 };

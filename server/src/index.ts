@@ -10,6 +10,7 @@ import 'dotenv/config';
  */
 import testRoute from './routes/testRoute';
 import authRoute from './routes/authRoute';
+import issueRoute from './routes/issueRoute';
 import projectRoute from './routes/projectRoute';
 
 /**
@@ -41,8 +42,9 @@ app.get('/', (req: Request, res: Response) => {
  * Use routes
  */
 app.use(`${BASE_PATH}/test`, testRoute);
-app.use(`${BASE_PATH}/project`, projectRoute)
-app.use(`${BASE_PATH}/auth`, authRoute)
+app.use(`${BASE_PATH}/project`, projectRoute);
+app.use(`${BASE_PATH}/auth`, authRoute);
+app.use(`${BASE_PATH}/issue`, issueRoute);
 
 /**
  * Error Handler

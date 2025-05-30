@@ -14,11 +14,17 @@ import {
   KeyboardSensor,
 } from '@dnd-kit/core';
 import { throttle } from 'lodash';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 
 /**
  * Types
  */
-import { IssueStatus, type Issue } from '@/types/issue';
+import {
+  IssueStatus,
+  type Issue,
+  type UpdateIssuePayload,
+} from '@/types/issue';
 
 /**
  * Components
@@ -26,23 +32,35 @@ import { IssueStatus, type Issue } from '@/types/issue';
 import { List } from './components/List';
 import { Filter } from './components/Filter';
 import { Issue as IssueComponent } from './components/Issue';
-import { useQuery } from '@tanstack/react-query';
+
+/**
+ * Services
+ */
 import { projectService } from '@/services/projectService';
-import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
+import { issueService } from '@/services/issueService';
+import { calculateNewPosition } from '@/utils/issue';
 
 export const BoardPage = () => {
   const [issues, setIssues] = useState<Issue[]>([]);
   const [activeIssue, setActiveIssue] = useState<Issue | null>(null);
-  const [isAfter, setIsAfter] = useState(false);
 
   const { data: projects, isLoading } = useQuery({
-    queryKey: ['auth-user'],
+    queryKey: ['projects'],
     queryFn: projectService.getProjects,
+  });
+
+  const updateIssueMutation = useMutation({
+    mutationFn: (data: UpdateIssuePayload) => issueService.updateIssue(data),
+    onError: (error) => {
+      console.error('Failed to update issue:', error);
+    },
   });
 
   useEffect(() => {
     if (projects?.[0]?.issues) {
-      setIssues(projects[0].issues);
+      setIssues(
+        projects[0].issues.sort((a, b) => a.listPosition - b.listPosition),
+      );
     }
   }, [projects]);
 
@@ -117,9 +135,36 @@ export const BoardPage = () => {
     [],
   );
 
+  /**
+   * Truong hop nhan 1 lan nhung ham handleDragEnd van chay
+   */
   const handleDragEnd = (event: DragEndEvent) => {
-    // const { active, over } = event;
+    const { active } = event;
     setActiveIssue(null);
+
+    if (!active) return;
+
+    const activeId = active.id;
+
+    const activeIssue = issues.find((issue) => issue.id === activeId);
+
+    const issuesInColumn = issues.filter(
+      (i) => i.status === activeIssue?.status,
+    );
+
+    const droppedIndex = issuesInColumn.findIndex(
+      (i) => i.id === activeIssue?.id,
+    );
+
+    const newPosition = calculateNewPosition(issuesInColumn, droppedIndex);
+
+    updateIssueMutation.mutate({
+      issueId: activeId as number,
+      data: {
+        status: activeIssue?.status!,
+        listPosition: newPosition,
+      },
+    });
   };
 
   if (isLoading) return <p>Loading</p>;

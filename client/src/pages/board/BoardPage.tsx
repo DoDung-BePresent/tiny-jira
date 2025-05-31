@@ -38,9 +38,19 @@ import { Issue as IssueComponent } from './components/Issue';
  */
 import { projectService } from '@/services/projectService';
 import { issueService } from '@/services/issueService';
+
+/**
+ * Utils
+ */
 import { calculateNewPosition } from '@/utils/issue';
 
+/**
+ * Hooks
+ */
+import { useToast } from '@/hooks/useToast';
+
 export const BoardPage = () => {
+  const { toast } = useToast();
   const [issues, setIssues] = useState<Issue[]>([]);
   const [activeIssue, setActiveIssue] = useState<Issue | null>(null);
 
@@ -51,6 +61,12 @@ export const BoardPage = () => {
 
   const updateIssueMutation = useMutation({
     mutationFn: (data: UpdateIssuePayload) => issueService.updateIssue(data),
+    onSuccess: () => {
+      toast.success({
+        title: 'Successfully!',
+        description: 'Save issue successfully!',
+      });
+    },
     onError: (error) => {
       console.error('Failed to update issue:', error);
     },

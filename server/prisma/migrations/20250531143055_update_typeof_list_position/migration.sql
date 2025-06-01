@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Issue" ALTER COLUMN "listPosition" SET DATA TYPE DOUBLE PRECISION;

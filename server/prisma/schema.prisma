@@ -44,7 +44,7 @@ model Issue {
   type          IssueType
   status        IssueStatus
   priority      IssuePriority
-  listPosition  Int
+  listPosition  Float
   description   String?
   estimate      Int?
   timeSpend     Int?

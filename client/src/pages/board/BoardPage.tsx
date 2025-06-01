@@ -81,7 +81,11 @@ export const BoardPage = () => {
   }, [projects]);
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
@@ -93,6 +97,11 @@ export const BoardPage = () => {
     if (issue) setActiveIssue(issue);
   };
 
+  /**
+   * Hạn chế:
+   * 1. Hàm bị cập nhật lại listPosition mỗi khi click vào issue, dù không có sự thay đổi về vị trí!
+   * 2. Hàm khi hover over 1 column thì ghi nhận vào column đó nhưng kéo quá khỏi column đó vẫn còn ghi nhận!
+   */
   const handleDragOver = useCallback(
     throttle((event: DragOverEvent) => {
       const { active, over } = event;
@@ -155,7 +164,7 @@ export const BoardPage = () => {
    * Truong hop nhan 1 lan nhung ham handleDragEnd van chay
    */
   const handleDragEnd = (event: DragEndEvent) => {
-    const { active } = event;
+    const { active, over } = event;
     setActiveIssue(null);
 
     if (!active) return;
@@ -163,6 +172,8 @@ export const BoardPage = () => {
     const activeId = active.id;
 
     const activeIssue = issues.find((issue) => issue.id === activeId);
+
+    if (!activeIssue) return;
 
     const issuesInColumn = issues.filter(
       (i) => i.status === activeIssue?.status,

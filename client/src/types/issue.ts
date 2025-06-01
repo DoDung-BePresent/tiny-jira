@@ -1,32 +1,32 @@
 import type { User } from './user';
 
-export enum IssueType {
-  TASK = 'TASK',
-  BUG = 'BUG',
-  STORY = 'STORY',
-}
+export const IssueType = {
+  TASK: 'TASK',
+  BUG: 'BUG',
+  STORY: 'STORY',
+};
 
-export enum IssuePriority {
-  LOWEST = 'LOWEST',
-  LOW = 'LOW',
-  MEDIUM = 'MEDIUM',
-  HIGH = 'HIGH',
-  HIGHEST = 'HIGHEST',
-}
+export const IssuePriority = {
+  LOWEST: 'LOWEST',
+  LOW: 'LOW',
+  MEDIUM: 'MEDIUM',
+  HIGH: 'HIGH',
+  HIGHEST: 'HIGHEST',
+};
 
-export enum IssueStatus {
-  BACKLOG = 'BACKLOG',
-  SELECTED = 'SELECTED',
-  INPROGRESS = 'INPROGRESS',
-  DONE = 'DONE',
-}
+export const IssueStatus = {
+  BACKLOG: 'BACKLOG',
+  SELECTED: 'SELECTED',
+  INPROGRESS: 'INPROGRESS',
+  DONE: 'DONE',
+};
 
 export type Issue = {
   id: number;
   title: string;
-  type: IssueType;
-  status: IssueStatus;
-  priority: IssuePriority;
+  type: keyof typeof IssueType;
+  status: keyof typeof IssueStatus;
+  priority: keyof typeof IssuePriority;
   listPosition: number;
   description?: string;
   estimate?: number;
@@ -39,7 +39,7 @@ export type Issue = {
 export type UpdateIssuePayload = {
   issueId: number;
   data: {
-    status: IssueStatus;
+    status: keyof typeof IssueStatus;
     listPosition: number;
   };
 };

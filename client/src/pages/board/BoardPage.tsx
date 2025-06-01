@@ -14,6 +14,7 @@ import {
   KeyboardSensor,
 } from '@dnd-kit/core';
 import { throttle } from 'lodash';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 
@@ -31,7 +32,9 @@ import {
  */
 import { List } from './components/List';
 import { Filter } from './components/Filter';
+import { IssueDetail } from './components/IssueDetail';
 import { Issue as IssueComponent } from './components/Issue';
+import { Dialog, DialogContent } from '@/components/ui/Dialog';
 
 /**
  * Services
@@ -48,9 +51,12 @@ import { calculateNewPosition } from '@/utils/issue';
  * Hooks
  */
 import { useToast } from '@/hooks/useToast';
+import { Combobox } from '@/components/ui/Combobox';
 
 export const BoardPage = () => {
   const { toast } = useToast();
+  const { issueId } = useParams<{ issueId: string }>();
+  const navigate = useNavigate();
   const [issues, setIssues] = useState<Issue[]>([]);
   const [activeIssue, setActiveIssue] = useState<Issue | null>(null);
 
@@ -164,7 +170,7 @@ export const BoardPage = () => {
    * Truong hop nhan 1 lan nhung ham handleDragEnd van chay
    */
   const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
+    const { active } = event;
     setActiveIssue(null);
 
     if (!active) return;
@@ -194,38 +200,61 @@ export const BoardPage = () => {
     });
   };
 
+  const handleCloseIssueDialog = () => {
+    navigate('/project/board');
+  };
+
   if (isLoading) return <p>Loading</p>;
   if (!projects?.length) return <p>No projects found</p>;
 
   return (
-    <DndContext
-      sensors={sensors}
-      onDragStart={handleDragStart}
-      onDragOver={handleDragOver}
-      onDragEnd={handleDragEnd}
-    >
-      <h1 className="mt-1 text-2xl font-medium text-[rgb(23,43,77)]">
-        Kanban board
-      </h1>
-      <Filter />
-      <div className="mt-6 flex gap-2">
-        {Object.values(IssueStatus).map((status) => (
-          <List
-            id={status}
-            key={status}
-            status={status}
-            issues={issues.filter((i) => i.status === status)}
-          />
-        ))}
-      </div>
-      <DragOverlay>
-        {activeIssue && (
-          <IssueComponent
-            {...activeIssue}
-            className="rotate-3 shadow-[5px_10px_30px_0px_rgba(9,30,66,0.15)] hover:bg-white"
-          />
-        )}
-      </DragOverlay>
-    </DndContext>
+    <>
+      <DndContext
+        sensors={sensors}
+        onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
+        onDragEnd={handleDragEnd}
+      >
+        <h1 className="mt-1 text-2xl font-medium text-[rgb(23,43,77)]">
+          Kanban board
+        </h1>
+        <Combobox
+          options={[
+            { value: '1', label: 'Option 1' },
+            { value: '2', label: 'Option 2' },
+          ]}
+          // value={selected}
+          // onChange={setSelected}
+          placeholder="Select something..."
+        />
+        <Filter />
+        <div className="mt-6 flex gap-2">
+          {Object.values(IssueStatus).map((status) => (
+            <List
+              id={status}
+              key={status}
+              status={status}
+              issues={issues.filter((i) => i.status === status)}
+            />
+          ))}
+        </div>
+        <DragOverlay>
+          {activeIssue && (
+            <IssueComponent
+              {...activeIssue}
+              className="rotate-3 shadow-[5px_10px_30px_0px_rgba(9,30,66,0.15)] hover:bg-white"
+            />
+          )}
+        </DragOverlay>
+      </DndContext>
+      {/* Issue Detail Dialog */}
+      <Dialog open={!!issueId} onOpenChange={handleCloseIssueDialog}>
+        <DialogContent>
+          {issueId && (
+            <IssueDetail issueId={issueId} onClose={handleCloseIssueDialog} />
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };

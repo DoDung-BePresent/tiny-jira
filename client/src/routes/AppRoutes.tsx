@@ -11,7 +11,7 @@ import { MainLayout } from '@/layouts/MainLayout';
 
 /**
  * Pages
-*/
+ */
 import { BoardPage } from '@/pages/board/BoardPage';
 import { ProjectSettingsPage } from '@/pages/project-settings/ProjectSettingsPage';
 
@@ -22,11 +22,12 @@ export const AppRoutes = () => {
         <Route element={<MainLayout />}>
           <Route path="/" element={<Navigate to="/project/board" replace />} />
           <Route
-            path="/project"
+            path="project"
             element={<Navigate to="/project/board" replace />}
           />
-          <Route path="/project/*">
+          <Route path="project">
             <Route path="board" element={<BoardPage />} />
+            <Route path="board/issue/:issueId" element={<BoardPage />} />
             <Route path="settings" element={<ProjectSettingsPage />} />
           </Route>
         </Route>

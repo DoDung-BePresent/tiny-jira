@@ -1,11 +1,11 @@
 import type { Issue } from './issue';
 import type { User } from './user';
 
-export enum CategoryType {
-  SOFTWARE = 'SOFTWARE',
-  MARKETING = 'MARKETING',
-  BUSINESS = 'BUSINESS',
-}
+export const CategoryType = {
+  SOFTWARE: 'SOFTWARE',
+  MARKETING: 'MARKETING',
+  BUSINESS: 'BUSINESS',
+};
 
 export type Project = {
   id: number;
@@ -14,5 +14,5 @@ export type Project = {
   description?: string;
   users: User[];
   issues: Issue[];
-  category: CategoryType;
+  category: keyof typeof CategoryType;
 };

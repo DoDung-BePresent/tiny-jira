@@ -19,6 +19,7 @@ import { IssuePriorityIcon, IssueTypeIcon } from './Icon';
 import { Avatar } from '@/components/ui/Avatar';
 import { cn } from '@/utils/tailwind';
 import { CSS } from '@dnd-kit/utilities';
+import { useNavigate } from 'react-router-dom';
 
 export const Issue = ({
   title,
@@ -32,6 +33,7 @@ export const Issue = ({
 }: IssueType & {
   className?: string;
 }) => {
+  const navigate = useNavigate();
   const {
     attributes,
     listeners,
@@ -54,11 +56,11 @@ export const Issue = ({
   };
 
   const handleClick = (e: React.MouseEvent) => {
-    // Chỉ handle click khi không đang drag
     if (isDragging) {
       e.preventDefault();
       return;
     }
+    navigate(`/project/board/issue/${id}`);
   };
 
   return (
